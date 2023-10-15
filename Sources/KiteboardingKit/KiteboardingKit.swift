@@ -25,47 +25,53 @@ enum KiteType {
     case bow
 }
 
-struct WindSpeed {
-    let ideal: Int?
-    let minimum: Int
-    let maximum: Int
+enum WindSpeed {
+    case knots (Double)
+    case milesPerHour (Double)
+    case metersPerSecond (Double)
 }
 
-struct CalculatorResult {
-    let speed: WindSpeed
-    let kiteSize: KiteSize
-    let boardOptions: BoardOptions
+enum KiteboarderWeight {
+    case pounds (Double)
+    case kilograms (Double)
 }
-
-struct TrainerResult {
-    let speed: WindSpeed
-    let board: BoardSize
-}
-
-typealias KiteboarderWeigth = Int
 
 protocol KiteboardingCalculatorType {
-    func calculate(weight: KiteboarderWeigth) -> CalculatorResult
-    func calculateTrainer() -> TrainerResult
+    func boardSize(weight: KiteboarderWeight) -> BoardSize
+    func kiteSize(weight: KiteboarderWeight, wind: WindSpeed) -> KiteSize
 }
 
 struct KiteboardingCalculator: KiteboardingCalculatorType {
     
-    func calculateTrainer() -> TrainerResult {
-        .init(speed: .init(ideal: 0, minimum: 0, maximum: 0),
-              board: .init(length: 0, width: 0, area: 0))
+    func boardSize(weight: KiteboarderWeight) -> BoardSize {
+        return .init(length: 0, width: 0, area: 0)
     }
     
-    func calculate(weight: KiteboarderWeigth) -> CalculatorResult {
-        return .init(speed: .init(ideal: 0,
-                                  minimum: 0,
-                                  maximum: 0),
-                     kiteSize: .init(ideal: 0.0, 
-                                     minimum: 0.0,
-                                     maximum: 0.0),
-                     boardOptions: .init(beginner: .init(length: 0, width: 0, area: 0),
-                                         lightWind: .init(length: 0, width: 0, area: 0),
-                                         normalWind: .init(length: 0, width: 0, area: 0),
-                                         hardWind: .init(length: 0, width: 0, area: 0)))
+    func kiteSize(
+        weight: KiteboarderWeight,
+        wind: WindSpeed
+    ) -> KiteSize {
+        // Convert weight to pounds
+        let weightInKilograms = switch weight {
+            case .pounds(let value): value / 2.2
+            case .kilograms(let value): value
+        }
+        // Convert wind speed to knots
+        let windSpeedInKnots = switch wind {
+        case .knots(let windSpeed): windSpeed
+        case .milesPerHour(let windSpeed): windSpeed / 1.151
+        case .metersPerSecond(let windSpeed): windSpeed / 1.852
+        }
+        // Calculate kite sizes using original formula
+        let ideal = (2.175 * weightInKilograms) / windSpeedInKnots
+        let roundedIdeal = (ideal * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        let minimum = 0.75 * (2.175 * weightInKilograms) / windSpeedInKnots
+        let roundedMinimum = (minimum * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        let maximum = (1.5 * 2.175 * weightInKilograms) / windSpeedInKnots
+        let roundedMaximum = (maximum * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        return .init(ideal: roundedIdeal, minimum: roundedMinimum, maximum: roundedMaximum)
     }
 }
