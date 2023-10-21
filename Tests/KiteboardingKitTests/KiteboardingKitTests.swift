@@ -30,4 +30,11 @@ final class KiteboardingKitTests: XCTestCase {
         XCTAssertEqual(result.maximum, .knots(21.2))
         XCTAssertEqual(result.minimum, .knots(10.6))
     }
+    
+    func testWindSpeedSI() throws {
+        let result = sut.windSpeed(weight: .kilograms(90.909), kiteSize: 14)
+        XCTAssertEqual(result.ideal, .knots(14.1))
+        XCTAssertEqual(result.maximum, .knots(21.2))
+        XCTAssertEqual(result.minimum, .knots(10.6))
+    }
 }
