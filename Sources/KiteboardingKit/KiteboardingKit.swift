@@ -28,7 +28,7 @@ enum KiteType {
 enum WindSpeed {
     case knots (Double)
     case milesPerHour (Double)
-    case metersPerSecond (Double)
+    case kilometersPerHour (Double)
 }
 
 enum KiteboarderWeight {
@@ -51,25 +51,25 @@ struct KiteboardingCalculator: KiteboardingCalculatorType {
         weight: KiteboarderWeight,
         wind: WindSpeed
     ) -> KiteSize {
-        // Convert weight to pounds
+        // Convert weight to kilograms
         let weightInKilograms = switch weight {
             case .pounds(let value): value / 2.2
             case .kilograms(let value): value
         }
         // Convert wind speed to knots
-        let windSpeedInKnots = switch wind {
-        case .knots(let windSpeed): windSpeed
-        case .milesPerHour(let windSpeed): windSpeed / 1.151
-        case .metersPerSecond(let windSpeed): windSpeed / 1.852
+        let windSpeedInKnots: Int = switch wind {
+        case .knots(let windSpeed): Int(windSpeed)
+        case .milesPerHour(let windSpeed): Int(windSpeed / 1.151)
+        case .kilometersPerHour(let windSpeed): Int(windSpeed / 1.852)
         }
         // Calculate kite sizes using original formula
-        let ideal = (2.175 * weightInKilograms) / windSpeedInKnots
+        let ideal = (2.175 * weightInKilograms) / Double(windSpeedInKnots)
         let roundedIdeal = (ideal * 10).rounded() / 10 // Rounded to 1 decimal place
         
-        let minimum = 0.75 * (2.175 * weightInKilograms) / windSpeedInKnots
+        let minimum = 0.75 * (2.175 * weightInKilograms) / Double(windSpeedInKnots)
         let roundedMinimum = (minimum * 10).rounded() / 10 // Rounded to 1 decimal place
         
-        let maximum = (1.5 * 2.175 * weightInKilograms) / windSpeedInKnots
+        let maximum = (1.5 * 2.175 * weightInKilograms) / Double(windSpeedInKnots)
         let roundedMaximum = (maximum * 10).rounded() / 10 // Rounded to 1 decimal place
         
         return .init(ideal: roundedIdeal, minimum: roundedMinimum, maximum: roundedMaximum)
