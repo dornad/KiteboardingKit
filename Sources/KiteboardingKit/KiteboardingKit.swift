@@ -7,17 +7,10 @@ struct KiteSize {
     let maximum: Double
 }
 
-struct BoardSize: Equatable {
-    let length: Double
-    let width: Double
-    let area: Double
-}
-
-struct BoardOptions {
-    let beginner: BoardSize
-    let lightWind: BoardSize
-    let normalWind: BoardSize
-    let hardWind: BoardSize
+struct WindSpeedResults {
+    let ideal: WindSpeed
+    let minimum: WindSpeed
+    let maximum: WindSpeed
 }
 
 enum KiteType {
@@ -25,7 +18,7 @@ enum KiteType {
     case bow
 }
 
-enum WindSpeed {
+enum WindSpeed: Equatable {
     case knots (Double)
     case milesPerHour (Double)
     case kilometersPerHour (Double)
@@ -37,16 +30,12 @@ enum KiteboarderWeight {
 }
 
 protocol KiteboardingCalculatorType {
-    func boardSize(weight: KiteboarderWeight) -> BoardSize
     func kiteSize(weight: KiteboarderWeight, wind: WindSpeed) -> KiteSize
+    func windSpeed(weight: KiteboarderWeight, kiteSize: Double) -> WindSpeedResults
 }
 
 struct KiteboardingCalculator: KiteboardingCalculatorType {
-    
-    func boardSize(weight: KiteboarderWeight) -> BoardSize {
-        return .init(length: 0, width: 0, area: 0)
-    }
-    
+        
     func kiteSize(
         weight: KiteboarderWeight,
         wind: WindSpeed
@@ -73,5 +62,30 @@ struct KiteboardingCalculator: KiteboardingCalculatorType {
         let roundedMaximum = (maximum * 10).rounded() / 10 // Rounded to 1 decimal place
         
         return .init(ideal: roundedIdeal, minimum: roundedMinimum, maximum: roundedMaximum)
+    }
+    
+    func windSpeed(
+        weight: KiteboarderWeight,
+        kiteSize: Double
+    ) -> WindSpeedResults {
+        // Convert weight to kilograms
+        let weightInKilograms = switch weight {
+            case .pounds(let value): value / 2.2
+            case .kilograms(let value): value
+        }
+        
+        // Calculate kite sizes using original formula
+        let ideal = (2.175 * weightInKilograms) / kiteSize
+        let roundedIdeal = (ideal * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        let minimum = 0.75 * (2.175 * weightInKilograms) / kiteSize
+        let roundedMinimum = (minimum * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        let maximum = (1.5 * 2.175 * weightInKilograms) / kiteSize
+        let roundedMaximum = (maximum * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        return .init(ideal: .knots(roundedIdeal),
+                     minimum: .knots(roundedMinimum),
+                     maximum: .knots(roundedMaximum))
     }
 }
