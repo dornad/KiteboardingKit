@@ -1,5 +1,5 @@
 import XCTest
-@testable import KiteboardingKit
+import KiteboardingKit
 
 final class KiteboardingKitTests: XCTestCase {
     
@@ -10,28 +10,40 @@ final class KiteboardingKitTests: XCTestCase {
         sut = KiteboardingCalculator()
     }
     
-    func testTrainerKite() throws {
-        let result = sut.calculateTrainer()
-        XCTAssertEqual(result.speed.ideal, nil)
-        XCTAssertEqual(result.speed.maximum, 10)
-        XCTAssertEqual(result.speed.minimum, 24)
-        
-        XCTAssertEqual(result.board, .init(length: 72, width: 19.1, area: 1213.5))
+    func testKiteSize() throws {
+        let result = sut.kiteSize(weight: .pounds(200), wind: .knots(14))
+        XCTAssertEqual(result.ideal, 14.1)
+        XCTAssertEqual(result.maximum, 21.1)
+        XCTAssertEqual(result.minimum, 10.6)
     }
     
-    func testKite() throws {
-        let result = sut.calculate(weight: 200)
-        XCTAssertEqual(result.speed.ideal, 20)
-        XCTAssertEqual(result.speed.maximum, 30)
-        XCTAssertEqual(result.speed.minimum, 15)
-        
-        XCTAssertEqual(result.kiteSize.ideal, 9.9)
-        XCTAssertEqual(result.kiteSize.maximum, 14.8)
-        XCTAssertEqual(result.kiteSize.minimum, 7.4)
-        
-        XCTAssertEqual(result.boardOptions.beginner, .init(length: 72, width: 19.1, area: 1213.5))
-        XCTAssertEqual(result.boardOptions.lightWind, .init(length: 63.6, width: 19.1, area: 1212.1))
-        XCTAssertEqual(result.boardOptions.normalWind, .init(length: 59.3, width: 17.5, area: 934.9))
-        XCTAssertEqual(result.boardOptions.hardWind, .init(length: 54.2, width: 16.1, area: 786.1))
+    func testKiteSizeSI() throws {
+        let result = sut.kiteSize(weight: .kilograms(90.7184), wind: .kilometersPerHour(26))
+        XCTAssertEqual(result.ideal, 14.1)
+        XCTAssertEqual(result.maximum, 21.1)
+        XCTAssertEqual(result.minimum, 10.6)
+    }
+    
+    func testWindSpeed() throws {
+        let result = sut.windSpeed(weight: .pounds(200), kiteSize: 14)
+        XCTAssertEqual(result.ideal, .knots(14.1))
+        XCTAssertEqual(result.maximum, .knots(21.1))
+        XCTAssertEqual(result.minimum, .knots(10.6))
+    }
+    
+    func testWindSpeedSI() throws {
+        let result = sut.windSpeed(weight: .kilograms(90.7184), kiteSize: 14)
+        XCTAssertEqual(result.ideal, .knots(14.1))
+        XCTAssertEqual(result.maximum, .knots(21.1))
+        XCTAssertEqual(result.minimum, .knots(10.6))
+    }
+    
+    func testBeginnerBoard() throws {
+        let result = sut.boardSize(weight: .pounds(200))
+        XCTAssertEqual(result.length, 183)
+        XCTAssertEqual(result.width, 48)
+        XCTAssertEqual(result.area, 7829)
     }
 }
+
+
