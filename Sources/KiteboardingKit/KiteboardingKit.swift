@@ -1,55 +1,78 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
+//
+//  KiteboardingKit.swift
+//
+//
+//  Created by Daniel Rodriguez on 10/26/23.
+//
 
-struct KiteSize {
-    let ideal: Double
-    let minimum: Double
-    let maximum: Double
+import Foundation
+
+// MARK: - KiteboardingCalculatorType
+
+/// A protocol that defines the requirements for a Kiteboarding calculator.
+///
+/// It provides methods to calculate the appropriate kite size, wind speed, and board size based on the user's weight and/or wind conditions.
+public protocol KiteboardingCalculatorType {
+    
+    /// Calculates the recommended kite size based on the user's weight and wind speed.
+    ///
+    /// The default implementation, `KiteboardingCalculator`, will take care of translating
+    /// the values you provide into the correct `Mass` and `Speed` units
+    ///
+    /// ## Usage
+    /// ```
+    /// let kiteSize = sut.kiteSize(weight: .pounds(200), wind: .knots(14))
+    /// print(kiteSize.ideal) // will print 14.1
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - weight: The weight of the user in some unit of mass.
+    ///   - wind: The wind speed in some unit of speed.
+    /// - Returns: A `KiteSize` object representing the recommended kite size.
+    func kiteSize(weight: Measurement<UnitMass>, wind: Measurement<UnitSpeed>) -> KiteSize
+    
+    /// Calculates the recommended wind speed for kiteboarding based on the user's weight and kite size.
+    ///
+    /// The default implementation, `KiteboardingCalculator`, will take care of translating
+    /// the values you provide into the correct `Mass` and `Speed` units
+    ///
+    /// - Parameters:
+    ///   - weight: The weight of the user in some unit of mass.
+    ///   - kiteSize: The size of the kite in square meters.
+    /// - Returns: A `WindSpeed` object representing the recommended wind speed.
+    func windSpeed(weight: Measurement<UnitMass>, kiteSize: Double) -> WindSpeed
+    
+    /// Calculates the recommended board size based on the user's weight.
+    ///
+    /// The default implementation, `KiteboardingCalculator`, will take care of translating
+    /// the values you provide into the correct `Mass` units
+    ///
+    /// - Parameter weight: The weight of the user in some unit of mass.
+    /// - Returns: A `BoardSize` object representing the recommended board size.
+    func boardSize(weight: Measurement<UnitMass>) -> BoardSize
 }
 
-struct WindSpeedResults {
-    let ideal: WindSpeed
-    let minimum: WindSpeed
-    let maximum: WindSpeed
-}
+// MARK: - KiteboardingCalculator
 
-enum KiteType {
-    case learner
-    case bow
-}
-
-enum WindSpeed: Equatable {
-    case knots (Double)
-    case milesPerHour (Double)
-    case kilometersPerHour (Double)
-}
-
-enum KiteboarderWeight {
-    case pounds (Double)
-    case kilograms (Double)
-}
-
-protocol KiteboardingCalculatorType {
-    func kiteSize(weight: KiteboarderWeight, wind: WindSpeed) -> KiteSize
-    func windSpeed(weight: KiteboarderWeight, kiteSize: Double) -> WindSpeedResults
-}
-
-struct KiteboardingCalculator: KiteboardingCalculatorType {
+public struct KiteboardingCalculator: KiteboardingCalculatorType {
+    
+    public init() {
+        // NO-OP
+    }
         
-    func kiteSize(
-        weight: KiteboarderWeight,
-        wind: WindSpeed
+    public func kiteSize(
+        weight: Measurement<UnitMass>,
+        wind: Measurement<UnitSpeed>
     ) -> KiteSize {
         // Convert weight to kilograms
-        let weightInKilograms = switch weight {
-            case .pounds(let value): value / 2.2
-            case .kilograms(let value): value
+        let weightInKilograms = switch weight.unit {
+            case .kilograms: weight.value
+            default: weight.converted(to: .kilograms).value
         }
         // Convert wind speed to knots
-        let windSpeedInKnots: Int = switch wind {
-        case .knots(let windSpeed): Int(windSpeed)
-        case .milesPerHour(let windSpeed): Int(windSpeed / 1.151)
-        case .kilometersPerHour(let windSpeed): Int(windSpeed / 1.852)
+        let windSpeedInKnots: Int = switch wind.unit {
+            case .knots: Int(wind.value)
+            default: Int(wind.converted(to: .knots).value)
         }
         // Calculate kite sizes using original formula
         let ideal = (2.175 * weightInKilograms) / Double(windSpeedInKnots)
@@ -64,14 +87,14 @@ struct KiteboardingCalculator: KiteboardingCalculatorType {
         return .init(ideal: roundedIdeal, minimum: roundedMinimum, maximum: roundedMaximum)
     }
     
-    func windSpeed(
-        weight: KiteboarderWeight,
+    public func windSpeed(
+        weight: Measurement<UnitMass>,
         kiteSize: Double
-    ) -> WindSpeedResults {
+    ) -> WindSpeed {
         // Convert weight to kilograms
-        let weightInKilograms = switch weight {
-            case .pounds(let value): value / 2.2
-            case .kilograms(let value): value
+        let weightInKilograms = switch weight.unit {
+            case .kilograms: weight.value
+            default: weight.converted(to: .kilograms).value
         }
         
         // Calculate kite sizes using original formula
@@ -87,5 +110,26 @@ struct KiteboardingCalculator: KiteboardingCalculatorType {
         return .init(ideal: .knots(roundedIdeal),
                      minimum: .knots(roundedMinimum),
                      maximum: .knots(roundedMaximum))
+    }
+    
+    public func boardSize(weight: Measurement<UnitMass>) -> BoardSize {
+        // Convert weight to kilograms
+        let weightInKilograms = switch weight.unit {
+            case .kilograms: weight.value
+            default: weight.converted(to: .kilograms).value
+        }
+        
+        let length = 40.72 * pow(weightInKilograms, 1.0 / 3.0)
+        let roundedLength = (length * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        let width = 10.78 * pow(weightInKilograms, 1.0 / 3.0)
+        let roundedWidth = (width * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        let area = length * width * 0.8834
+        let roundedArea = (area * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        return .init(length: Int(roundedLength),
+                     width: Int(roundedWidth),
+                     area: Int(roundedArea))
     }
 }
