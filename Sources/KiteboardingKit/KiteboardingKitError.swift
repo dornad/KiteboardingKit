@@ -9,10 +9,11 @@ import Foundation
 
 // MARK: - KiteboardingCalculatorError
 
-/// <#Description#>
+/// Defines the errors that can occur when calculating kiteboarding kit requirements.
 public enum KiteboardingKitError: Error {
-    /// It is challenging to kite in `<10` knots
-    case belowNineKnots
-    /// Wind Speed for Trainer Kites shouldn't exceed 24 knots.
+    /// Error indicating that the wind speed is below 10 knots, making it difficult to kiteboard.
+    case difficultToKiteboard
+    
+    /// Error indicating that the wind speed for trainer kites has exceeded the safe limit of 24 knots.
     case trainerKiteAboveSafeLevel
 }

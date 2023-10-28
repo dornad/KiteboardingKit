@@ -14,12 +14,18 @@ import Foundation
 /// It provides methods to calculate the appropriate kite size, wind speed, and board size based on the user's weight and/or wind conditions.
 public protocol KiteboardingCalculatorType {
     
-    /// <#Description#>
+    /// Calculates the appropriate learner kite size based on the user's weight and current wind speed.
+    ///
+    /// The default implementation, `KiteboardingCalculator`, will take care of translating
+    /// the values you provide into the correct `Mass` and `Speed` units
+    ///
     /// - Parameters:
-    ///   - weight: <#weight description#>
-    ///   - wind: <#wind description#>
-    /// - Returns: <#description#>
-    /// - Throws: <#description#>
+    ///   - weight: The weight of the user in some unit of mass.
+    ///   - wind: The wind speed in some unit of speed.
+    ///
+    /// - Returns: The recommended `KiteSize` for a learner kite.
+    ///
+    /// - Throws: `KiteboardingKitError` if the wind speed is  too high for safe kiteboarding with a learner kite
     func trainerKiteSize(weight: Measurement<UnitMass>,
                          wind: Measurement<UnitSpeed>) throws -> KiteSize
     
