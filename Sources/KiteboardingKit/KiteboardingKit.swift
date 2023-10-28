@@ -14,6 +14,21 @@ import Foundation
 /// It provides methods to calculate the appropriate kite size, wind speed, and board size based on the user's weight and/or wind conditions.
 public protocol KiteboardingCalculatorType {
     
+    /// Calculates the appropriate learner kite size based on the user's weight and current wind speed.
+    ///
+    /// The default implementation, `KiteboardingCalculator`, will take care of translating
+    /// the values you provide into the correct `Mass` and `Speed` units
+    ///
+    /// - Parameters:
+    ///   - weight: The weight of the user in some unit of mass.
+    ///   - wind: The wind speed in some unit of speed.
+    ///
+    /// - Returns: The recommended `KiteSize` for a learner kite.
+    ///
+    /// - Throws: `KiteboardingKitError` if the wind speed is  too high for safe kiteboarding with a learner kite
+    func trainerKiteSize(weight: Measurement<UnitMass>,
+                         wind: Measurement<UnitSpeed>) throws -> KiteSize
+    
     /// Calculates the recommended kite size based on the user's weight and wind speed.
     ///
     /// The default implementation, `KiteboardingCalculator`, will take care of translating
@@ -28,8 +43,8 @@ public protocol KiteboardingCalculatorType {
     /// - Parameters:
     ///   - weight: The weight of the user in some unit of mass.
     ///   - wind: The wind speed in some unit of speed.
-    /// - Returns: A `KiteSize` object representing the recommended kite size.
-    func kiteSize(weight: Measurement<UnitMass>, wind: Measurement<UnitSpeed>) -> KiteSize
+    /// - Returns: A `KiteSizeRange` object representing the recommended kite size.
+    func kiteSize(weight: Measurement<UnitMass>, wind: Measurement<UnitSpeed>) -> KiteSizeRange
     
     /// Calculates the recommended wind speed for kiteboarding based on the user's weight and kite size.
     ///
@@ -59,11 +74,39 @@ public struct KiteboardingCalculator: KiteboardingCalculatorType {
     public init() {
         // NO-OP
     }
+    
+    public func trainerKiteSize(
+        weight: Measurement<UnitMass>,
+        wind: Measurement<UnitSpeed>
+    ) throws -> KiteSize {
+        // Convert weight to kilograms
+        let weightInKilograms = switch weight.unit {
+            case .kilograms: weight.value
+            default: weight.converted(to: .kilograms).value
+        }
+        // Convert wind speed to knots
+        let windSpeedInKnots: Int = switch wind.unit {
+            case .knots: Int(wind.value)
+            default: Int(wind.converted(to: .knots).value)
+        }
+        
+        // calculate the kite size, taking into account the lower
+        // and upper bounds for safety.
+        let kiteSize: KiteSize = switch windSpeedInKnots {
+            case Int.min ..< 10: 4.7
+            case 11 ... 24: (0.52 * weightInKilograms) / Double(windSpeedInKnots)
+            default: throw KiteboardingKitError.trainerKiteAboveSafeLevel
+        }
+        
+        let roundedSize = (kiteSize * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        return roundedSize
+    }
         
     public func kiteSize(
         weight: Measurement<UnitMass>,
         wind: Measurement<UnitSpeed>
-    ) -> KiteSize {
+    ) -> KiteSizeRange {
         // Convert weight to kilograms
         let weightInKilograms = switch weight.unit {
             case .kilograms: weight.value
