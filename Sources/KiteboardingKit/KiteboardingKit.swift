@@ -57,6 +57,15 @@ public protocol KiteboardingCalculatorType {
     /// - Returns: A `WindSpeed` object representing the recommended wind speed.
     func windSpeed(weight: Measurement<UnitMass>, kiteSize: Double) -> WindSpeed
     
+    /// Calculates the recommended beginner board size based on the user's weight.
+    ///
+    /// The default implementation, `KiteboardingCalculator`, will take care of translating
+    /// the values you provide into the correct `Mass` units
+    ///
+    /// - Parameter weight: The weight of the user in some unit of mass.
+    /// - Returns: A `BoardSize` object representing the recommended board size.
+    func beginnerBoardSize(weight: Measurement<UnitMass>) -> BoardSize
+    
     /// Calculates the recommended board size based on the user's weight.
     ///
     /// The default implementation, `KiteboardingCalculator`, will take care of translating
@@ -64,7 +73,7 @@ public protocol KiteboardingCalculatorType {
     ///
     /// - Parameter weight: The weight of the user in some unit of mass.
     /// - Returns: A `BoardSize` object representing the recommended board size.
-    func boardSize(weight: Measurement<UnitMass>) -> BoardSize
+    func boardSize(weight: Measurement<UnitMass>) -> BoardSizeRange
 }
 
 // MARK: - KiteboardingCalculator
@@ -155,7 +164,7 @@ public struct KiteboardingCalculator: KiteboardingCalculatorType {
                      maximum: .knots(roundedMaximum))
     }
     
-    public func boardSize(weight: Measurement<UnitMass>) -> BoardSize {
+    public func beginnerBoardSize(weight: Measurement<UnitMass>) -> BoardSize {
         // Convert weight to kilograms
         let weightInKilograms = switch weight.unit {
             case .kilograms: weight.value
@@ -174,5 +183,15 @@ public struct KiteboardingCalculator: KiteboardingCalculatorType {
         return .init(length: Int(roundedLength),
                      width: Int(roundedWidth),
                      area: Int(roundedArea))
+    }
+    
+    public func boardSize(weight: Measurement<UnitMass>) -> BoardSizeRange {
+        // Convert weight to kilograms
+        let weightInKilograms = switch weight.unit {
+            case .kilograms: weight.value
+            default: weight.converted(to: .kilograms).value
+        }
+        
+        fatalError("not implemented")
     }
 }

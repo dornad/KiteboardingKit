@@ -1,7 +1,14 @@
+//
+//  KiteTests.swift
+//
+//
+//  Created by Daniel Rodriguez on 10/31/23.
+//
+
 import XCTest
 import KiteboardingKit
 
-final class KiteboardingKitTests: XCTestCase {
+final class KiteTests: XCTestCase {
     
     var sut: KiteboardingCalculatorType!
     
@@ -68,13 +75,4 @@ final class KiteboardingKitTests: XCTestCase {
         XCTAssertEqual(result.maximum, .knots(21.1))
         XCTAssertEqual(result.minimum, .knots(10.6))
     }
-    
-    func testBeginnerBoard() throws {
-        let result = sut.boardSize(weight: .pounds(200))
-        XCTAssertEqual(result.length, 183)
-        XCTAssertEqual(result.width, 48)
-        XCTAssertEqual(result.area, 7829)
-    }
 }
-
-

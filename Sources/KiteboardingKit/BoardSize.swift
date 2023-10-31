@@ -1,5 +1,5 @@
 //
-//  Board.swift
+//  BoardSize.swift
 //
 //
 //  Created by Daniel Rodriguez on 10/26/23.
@@ -16,3 +16,6 @@ public struct BoardSize {
     /// The area of the kiteboarding board calculated based on its length and width.
     public let area: Int
 }
+
+/// Represents the ideal, minimum, and maximum sizes for a Board.
+public typealias BoardSizeRange = ItemRange<BoardSize>

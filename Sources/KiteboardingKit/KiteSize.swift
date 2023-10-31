@@ -11,15 +11,4 @@ import Foundation
 public typealias KiteSize = Double
 
 /// Represents the ideal, minimum, and maximum sizes for a kite.
-public struct KiteSizeRange {
-    /// The ideal size (in square meters) of the kite based on wind speed and (rider) weight.
-    public let ideal: KiteSize
-    /// The minimum size (in square meters) of the kite based on wind speed and (rider) weight.
-    ///
-    /// You can consider this the "lower" bound of the Kite Range
-    public let minimum: KiteSize
-    /// The maximum size (in square meters)  of the kite based on wind speed and (rider) weight.
-    ///
-    /// You can consider this the "upper" bound of the Kite Range
-    public let maximum: KiteSize
-}
+public typealias KiteSizeRange = ItemRange<KiteSize>
