@@ -57,23 +57,14 @@ public protocol KiteboardingCalculatorType {
     /// - Returns: A `WindSpeed` object representing the recommended wind speed.
     func windSpeed(weight: Measurement<UnitMass>, kiteSize: Double) -> WindSpeed
     
-    /// Calculates the recommended beginner board size based on the user's weight.
+    /// Calculates the board size options based on the user's weight.
     ///
     /// The default implementation, `KiteboardingCalculator`, will take care of translating
     /// the values you provide into the correct `Mass` units
     ///
     /// - Parameter weight: The weight of the user in some unit of mass.
-    /// - Returns: A `BoardSize` object representing the recommended board size.
-    func beginnerBoardSize(weight: Measurement<UnitMass>) -> BoardSize
-    
-    /// Calculates the recommended board size based on the user's weight.
-    ///
-    /// The default implementation, `KiteboardingCalculator`, will take care of translating
-    /// the values you provide into the correct `Mass` units
-    ///
-    /// - Parameter weight: The weight of the user in some unit of mass.
-    /// - Returns: A `BoardSize` object representing the recommended board size.
-    func boardSize(weight: Measurement<UnitMass>) -> BoardSizeRange
+    /// - Returns: A `BoardOptions` object representing the recommended board options for beginner, light, normal and heavy wind.
+    func boardSize(weight: Measurement<UnitMass>) -> BoardOptions
 }
 
 // MARK: - KiteboardingCalculator
@@ -164,34 +155,38 @@ public struct KiteboardingCalculator: KiteboardingCalculatorType {
                      maximum: .knots(roundedMaximum))
     }
     
-    public func beginnerBoardSize(weight: Measurement<UnitMass>) -> BoardSize {
+    public func boardSize(weight: Measurement<UnitMass>) -> BoardOptions {
         // Convert weight to kilograms
         let weightInKilograms = switch weight.unit {
             case .kilograms: weight.value
             default: weight.converted(to: .kilograms).value
         }
         
-        let length = 40.72 * pow(weightInKilograms, 1.0 / 3.0)
-        let roundedLength = (length * 10).rounded() / 10 // Rounded to 1 decimal place
-        
-        let width = 10.78 * pow(weightInKilograms, 1.0 / 3.0)
-        let roundedWidth = (width * 10).rounded() / 10 // Rounded to 1 decimal place
-        
-        let area = length * width * 0.8834
-        let roundedArea = (area * 10).rounded() / 10 // Rounded to 1 decimal place
-        
-        return .init(length: Int(roundedLength),
-                     width: Int(roundedWidth),
-                     area: Int(roundedArea))
+        return .init(
+            beginner: boardSize(lengthModifier: 40.72, widthModifier: 10.78, areaModifier: 0.8834, weight: weightInKilograms),
+            lightWind: boardSize(lengthModifier: 35.93, widthModifier: 10.78, areaModifier: 1.0, weight: weightInKilograms),
+            normalWind: boardSize(lengthModifier: 33.53, widthModifier: 9.9, areaModifier: 0.9, weight: weightInKilograms),
+            hardWind: boardSize(lengthModifier: 30.66, widthModifier: 9.1036, areaModifier: 0.9, weight: weightInKilograms)
+        )
     }
     
-    public func boardSize(weight: Measurement<UnitMass>) -> BoardSizeRange {
-        // Convert weight to kilograms
-        let weightInKilograms = switch weight.unit {
-            case .kilograms: weight.value
-            default: weight.converted(to: .kilograms).value
-        }
+    private func boardSize(
+        lengthModifier: Double,
+        widthModifier: Double,
+        areaModifier: Double,
+        weight: Double
+    ) -> BoardSize {
+        let length = lengthModifier * pow(weight, 1.0 / 3.0)
+        let roundedLength = (length * 10).rounded() / 10 // Rounded to 1 decimal place
         
-        fatalError("not implemented")
+        let width = widthModifier * pow(weight, 1.0 / 3.0)
+        let roundedWidth = (width * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        let area = length * width * areaModifier
+        let roundedArea = (area * 10).rounded() / 10 // Rounded to 1 decimal place
+        
+        return .init(length: roundedLength,
+                     width: roundedWidth,
+                     area: roundedArea)
     }
 }

@@ -10,12 +10,21 @@ import Foundation
 /// Represents the dimensions of a kiteboarding board.
 public struct BoardSize {
     /// The length of the kiteboarding board in cm
-    public let length: Int
+    public let length: Double
     /// The width of the kiteboarding board in cm
-    public let width: Int
+    public let width: Double
     /// The area of the kiteboarding board calculated based on its length and width.
-    public let area: Int
+    public let area: Double
 }
 
-/// Represents the ideal, minimum, and maximum sizes for a Board.
-public typealias BoardSizeRange = ItemRange<BoardSize>
+/// <#Description#>
+public struct BoardOptions {
+    /// <#Description#>
+    public let beginner: BoardSize
+    /// <#Description#>
+    public let lightWind: BoardSize
+    /// <#Description#>
+    public let normalWind: BoardSize
+    /// <#Description#>
+    public let hardWind: BoardSize
+}
