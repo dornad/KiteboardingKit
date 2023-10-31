@@ -17,14 +17,14 @@ public struct BoardSize {
     public let area: Double
 }
 
-/// <#Description#>
+/// Provides various board size options for different kiteboarding scenarios.
 public struct BoardOptions {
-    /// <#Description#>
+    /// The recommended board size for beginners.
     public let beginner: BoardSize
-    /// <#Description#>
+    /// The recommended board size for light wind conditions.
     public let lightWind: BoardSize
-    /// <#Description#>
+    /// The recommended board size for normal wind conditions.
     public let normalWind: BoardSize
-    /// <#Description#>
+    /// The recommended board size for strong wind conditions.
     public let hardWind: BoardSize
 }

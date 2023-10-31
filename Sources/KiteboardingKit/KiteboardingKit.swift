@@ -170,6 +170,17 @@ public struct KiteboardingCalculator: KiteboardingCalculatorType {
         )
     }
     
+    /// Calculates the size of a kitesurfing/kiteboarding board based on weight and other modifiers.
+    ///
+    /// All the modifier values passed to this function come from J. Douglass kitesurfing spreadsheet.
+    ///
+    /// - Parameters:
+    ///   - lengthModifier: A multiplier to modify the calculated length of the board, so it matches a specific wind condition
+    ///   - widthModifier: A multiplier to modify the calculated width of the board, , so it matches a specific wind condition
+    ///   - areaModifier: A multiplier to modify the calculated area of the board, so it matches a specific wind condition
+    ///   - weight: The weight of the kiteboarder in kilograms.
+    ///
+    /// - Returns: A `BoardSize` struct containing the calculated dimensions (length, width, and area) for the kitesurfing/kiteboarding board.
     private func boardSize(
         lengthModifier: Double,
         widthModifier: Double,
