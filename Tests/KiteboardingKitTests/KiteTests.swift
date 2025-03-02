@@ -5,74 +5,69 @@
 //  Created by Daniel Rodriguez on 10/31/23.
 //
 
-import XCTest
+import Testing
+
 import KiteboardingKit
 
-final class KiteTests: XCTestCase {
-    
+struct KiteTests {
     var sut: KiteboardingCalculatorType!
     
-    override func setUp() {
-        super.setUp()
+    init() async throws {
         sut = KiteboardingCalculator()
     }
     
-    func testLearnerKiteSize() throws {
+    @Test
+    func learnerKiteSize() async throws {
         let result = try sut.trainerKiteSize(weight: .pounds(200), wind: .knots(14))
-        XCTAssertEqual(result, 3.4)
+        #expect(result == 3.4)
     }
     
-    func testLearnerKiteSizeInSafeConditions() throws {
-        
-        XCTAssertEqual(
-            try sut.trainerKiteSize(weight: .pounds(200), wind: .knots(24)),
-            2.0
+    @Test
+    func LearnerKiteSizeInSafeConditions() throws {
+        #expect(
+            try sut.trainerKiteSize(weight: .pounds(200), wind: .knots(24)) == 2.0
         )
         
-        XCTAssertThrowsError(
+        #expect(throws: KiteboardingKitError.self, "Wind Speed for Trainer Kites shouldn’t exceed 24 knots.") {
             try sut.trainerKiteSize(weight: .pounds(200), wind: .knots(25))
-        ) { error in
-            XCTAssertEqual(error as? KiteboardingKitError,
-                           KiteboardingKitError.trainerKiteAboveSafeLevel,
-                           "Wind Speed for Trainer Kites shouldn’t exceed 24 knots.")
         }
         
-        XCTAssertThrowsError(
-            try sut.trainerKiteSize(weight: .pounds(200), wind: .knots(26))
-        ) { error in
-            XCTAssertEqual(error as? KiteboardingKitError,
-                           KiteboardingKitError.trainerKiteAboveSafeLevel,
-                           "Wind Speed for Trainer Kites shouldn’t exceed 24 knots.")
+        #expect(throws: KiteboardingKitError.self, "Wind Speed for Trainer Kites shouldn’t exceed 24 knots.") {
+            try sut.trainerKiteSize(weight: .pounds(200), wind: .knots(25))
         }
     }
     
-    func testKiteSize() throws {
+    @Test
+    func kiteSize() throws {
         let result = sut.kiteSize(weight: .pounds(200),
                                   wind: .knots(14))
-        XCTAssertEqual(result.ideal, 14.1)
-        XCTAssertEqual(result.maximum, 21.1)
-        XCTAssertEqual(result.minimum, 10.6)
+        #expect(result.ideal == 14.1)
+        #expect(result.maximum == 21.1)
+        #expect(result.minimum == 10.6)
     }
     
-    func testKiteSizeSI() throws {
+    @Test
+    func kiteSizeSI() throws {
         let result = sut.kiteSize(weight: .kilograms(90.7184),
                                   wind: .kilometersPerHour(26))
-        XCTAssertEqual(result.ideal, 14.1)
-        XCTAssertEqual(result.maximum, 21.1)
-        XCTAssertEqual(result.minimum, 10.6)
+        #expect(result.ideal == 14.1)
+        #expect(result.maximum == 21.1)
+        #expect(result.minimum == 10.6)
     }
     
-    func testWindSpeed() throws {
+    @Test
+    func windSpeed() throws {
         let result = sut.windSpeed(weight: .pounds(200), kiteSize: 14)
-        XCTAssertEqual(result.ideal, .knots(14.1))
-        XCTAssertEqual(result.maximum, .knots(21.1))
-        XCTAssertEqual(result.minimum, .knots(10.6))
+        #expect(result.ideal == .knots(14.1))
+        #expect(result.maximum == .knots(21.1))
+        #expect(result.minimum == .knots(10.6))
     }
     
-    func testWindSpeedSI() throws {
+    @Test
+    func windSpeedSI() throws {
         let result = sut.windSpeed(weight: .kilograms(90.7184), kiteSize: 14)
-        XCTAssertEqual(result.ideal, .knots(14.1))
-        XCTAssertEqual(result.maximum, .knots(21.1))
-        XCTAssertEqual(result.minimum, .knots(10.6))
+        #expect(result.ideal == .knots(14.1))
+        #expect(result.maximum == .knots(21.1))
+        #expect(result.minimum == .knots(10.6))
     }
 }
