@@ -6,7 +6,7 @@ This file documents the codebase structure, conventions, and workflows for AI as
 
 **KiteboardingKit** is a zero-dependency Swift library that provides kiteboarding/kitesurfing equipment recommendation logic for Apple platforms. The formulas originate from [Jim Douglass's interactive kiteboarding calculator spreadsheet](http://jimbodouglass.blogspot.com/2011/01/interactive-kiteboarding-calculator.html).
 
-**Language**: Swift 5.9+
+**Language**: Swift 6.1+
 **Package Manager**: Swift Package Manager (SPM)
 **Type**: Pure library — no app target, no external dependencies
 **License**: MIT
@@ -17,7 +17,7 @@ This file documents the codebase structure, conventions, and workflows for AI as
 
 ```
 KiteboardingKit/
-├── .github/workflows/swift.yml        # CI: build + test on macOS with Swift 5.9
+├── .github/workflows/swift.yml        # CI: build + test on macOS with Swift 6.1
 ├── Sources/KiteboardingKit/
 │   ├── KiteboardingKit.swift          # Main protocol + calculator implementation (203 lines)
 │   ├── KiteboardingKitError.swift     # Error enum (2 cases)
@@ -28,7 +28,7 @@ KiteboardingKit/
 ├── Tests/KiteboardingKitTests/
 │   ├── KiteTests.swift                # 6 test methods covering kite calculations
 │   └── BoardTests.swift               # 4 test methods covering board calculations
-├── Package.swift                      # SPM manifest — swift-tools-version: 5.9
+├── Package.swift                      # SPM manifest — swift-tools-version: 6.1
 └── README.md
 ```
 
@@ -47,7 +47,7 @@ swift test -v
 swift test --filter KiteTests/testKiteSize
 ```
 
-All CI runs on `macos-latest` with Swift 5.9.0 (see `.github/workflows/swift.yml`).
+All CI runs on `macos-latest` with Swift 6.1 (see `.github/workflows/swift.yml`).
 
 ---
 
@@ -60,10 +60,10 @@ The public API is defined as a protocol:
 ```swift
 // Sources/KiteboardingKit/KiteboardingKit.swift
 public protocol KiteboardingCalculatorType {
-    func trainerKiteSize(weight:windSpeed:) throws -> KiteSizeRange
-    func kiteSize(weight:windSpeed:)        throws -> KiteSizeRange
-    func windSpeed(weight:kiteSize:)        throws -> WindSpeed
-    func boardSize(weight:)                 throws -> BoardOptions
+    func trainerKiteSize(weight:wind:) throws -> KiteSize
+    func kiteSize(weight:wind:)               -> KiteSizeRange
+    func windSpeed(weight:kiteSize:)          -> WindSpeed
+    func boardSize(weight:)                   -> BoardOptions
 }
 ```
 
@@ -134,11 +134,11 @@ public enum KiteboardingKitError: Error {
 
 ## Testing Conventions
 
-- Framework: **XCTest**
+- Framework: **Swift Testing** (`import Testing`, `@Test`, `#expect`)
 - Test files mirror the feature they test (`KiteTests.swift` → kite calculations, `BoardTests.swift` → board calculations).
-- Tests use both imperial and SI inputs to verify unit conversion correctness (e.g., `testKiteSize` vs. `testKiteSizeSI`).
-- Prefer `XCTAssertEqual` with explicit `accuracy:` for floating-point comparisons where relevant.
-- All test methods should be `func test<Concept>()` — no parameters.
+- Tests use both imperial and SI inputs to verify unit conversion correctness (e.g., `kiteSize` vs. `kiteSizeSI`).
+- Use `#expect` for assertions and `#expect(throws:)` for error expectations.
+- Test methods use the `@Test` attribute and do not require a `test` prefix.
 
 ---
 
@@ -146,7 +146,7 @@ public enum KiteboardingKitError: Error {
 
 Defined in `.github/workflows/swift.yml`:
 - Triggers on **push** and **pull request** to `main`.
-- Runs `swift build -v` then `swift test -v` on `macos-latest` with Swift 5.9.0.
+- Runs `swift build -v` then `swift test -v` on `macos-latest` with Swift 6.1.
 - There is no separate lint step — the Swift compiler warnings serve as the linter.
 
 ---
