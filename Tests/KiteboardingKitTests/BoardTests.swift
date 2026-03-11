@@ -9,11 +9,7 @@ import Testing
 import KiteboardingKit
 
 struct BoardTests {
-    var sut: KiteboardingCalculatorType!
-    
-    init() async throws {
-        sut = KiteboardingCalculator()
-    }
+    let sut = KiteboardingCalculator()
     
     @Test
     func beginnerBoard() throws {
