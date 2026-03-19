@@ -8,11 +8,17 @@
 import Foundation
 
 /// Represents the ideal, minimum, and maximum wind speeds for kiteboarding.
-public struct WindSpeed {
+public struct WindSpeed: Equatable {
     /// The ideal wind speed measurement based on factors such as kite size and rider weight.
     public let ideal: Measurement<UnitSpeed>
     /// The minimum wind speed measurement needed for safe kiteboarding.
     public let minimum: Measurement<UnitSpeed>
     /// The maximum wind speed measurement considered safe for kiteboarding.
     public let maximum: Measurement<UnitSpeed>
+    
+    public static func == (lhs: WindSpeed, rhs: WindSpeed) -> Bool {
+        lhs.ideal == rhs.ideal &&
+        lhs.minimum == rhs.minimum &&
+        lhs.maximum == rhs.maximum
+    }
 }
