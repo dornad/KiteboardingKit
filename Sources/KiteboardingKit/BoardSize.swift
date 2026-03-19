@@ -8,7 +8,7 @@
 import Foundation
 
 /// Represents the dimensions of a kiteboarding board.
-public struct BoardSize {
+public struct BoardSize: Equatable {
     /// The length of the kiteboarding board in cm
     public let length: Double
     /// The width of the kiteboarding board in cm
@@ -18,7 +18,7 @@ public struct BoardSize {
 }
 
 /// Provides various board size options for different kiteboarding scenarios.
-public struct BoardOptions {
+public struct BoardOptions: Equatable {
     /// The recommended board size for beginners.
     public let beginner: BoardSize
     /// The recommended board size for light wind conditions.

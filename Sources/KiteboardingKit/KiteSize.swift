@@ -11,7 +11,7 @@ import Foundation
 public typealias KiteSize = Double
 
 /// Represents the ideal, minimum, and maximum sizes for a kite.
-public struct KiteSizeRange {
+public struct KiteSizeRange: Equatable {
     /// The ideal size (in square meters) of the kite based on wind speed and (rider) weight.
     public let ideal: KiteSize
     /// The minimum size (in square meters) of the kite based on wind speed and (rider) weight.
@@ -22,4 +22,12 @@ public struct KiteSizeRange {
     ///
     /// You can consider this the "upper" bound of the Kite Range
     public let maximum: KiteSize
+    
+    public static func == (lhs: KiteSizeRange, rhs: KiteSizeRange) -> Bool {
+        lhs.ideal == rhs.ideal &&
+        lhs.minimum == rhs.minimum &&
+        lhs.maximum == rhs.maximum
+    }
 }
+
+
